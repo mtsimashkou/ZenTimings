@@ -75,10 +75,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ZenStates-Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Common\ZenStates-Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -247,6 +243,10 @@
     <Resource Include="Resources\splash.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\modules\ZenStates-Core\ZenStates-Core.csproj">
+      <Project>{0fee21c1-c6d8-42e3-b0e6-9195dc77fd2c}</Project>
+      <Name>ZenStates-Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OHWMPlugin\OHWMPlugin.csproj">
       <Project>{29941469-27ad-4c9b-8de2-7e971105a99c}</Project>
       <Name>OHWMPlugin</Name>
