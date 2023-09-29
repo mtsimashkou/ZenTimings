@@ -1,0 +1,6 @@
+[submodule "modules/openhardwaremonitor"]
+	path = modules/openhardwaremonitor
+	url = git@github.com:mtsimashkou/openhardwaremonitor.git
+[submodule "modules/ZenStates-Core"]
+	path = modules/ZenStates-Core
+	url = git@github.com:mtsimashkou/ZenStates-Core.git
