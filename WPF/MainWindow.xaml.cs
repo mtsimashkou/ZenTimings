@@ -933,7 +933,7 @@ namespace ZenTimings
             {
                 labelCPU.Text = cpu.systemInfo.CpuName;
                 labelMB.Text =
-                    $"{cpu.systemInfo.MbName} | BIOS {cpu.systemInfo.BiosVersion} | SMU {cpu.systemInfo.GetSmuVersionString()}";
+                    $"{cpu.systemInfo.MbVendor} {cpu.systemInfo.MbName} | BIOS {cpu.systemInfo.BiosVersion} | SMU {cpu.systemInfo.GetSmuVersionString()}";
             }
             //ShowWindow();
 

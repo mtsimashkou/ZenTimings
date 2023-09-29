@@ -27,8 +27,9 @@ namespace ZenTimings.Windows
 
         public static void Start()
         {
+#if !DEBUG
             splash.Show();
-
+#endif
             if (appSettings.AppTheme != AppSettings.THEME.LIGHT)
                 appSettings.ChangeTheme();
 

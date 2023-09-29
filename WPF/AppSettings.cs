@@ -29,7 +29,7 @@ namespace ZenTimings
             AutoRefreshInterval = 2000;
             AdvancedMode = true;
             // DarkMode = false;
-            CheckForUpdates = true;
+            CheckForUpdates = false;
             SaveWindowPosition = false;
             WindowLeft = 0;
             WindowTop = 0;
