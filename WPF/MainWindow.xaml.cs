@@ -933,7 +933,7 @@ namespace ZenTimings
             {
                 labelCPU.Text = cpu.systemInfo.CpuName;
                 labelMB.Text =
-                    $"{cpu.systemInfo.MbVendor} {cpu.systemInfo.MbName} | BIOS {cpu.systemInfo.BiosVersion} | SMU {cpu.systemInfo.GetSmuVersionString()}";
+                    $"{cpu.systemInfo.MbVendor} | {cpu.systemInfo.MbName} | BIOS {cpu.systemInfo.BiosVersion} | SMU {cpu.systemInfo.GetSmuVersionString()}";
             }
             //ShowWindow();
 
@@ -1146,6 +1146,26 @@ namespace ZenTimings
         {
             Config Config = new Config(MEMCFG, BMC.Config/*, cpu.powerTable*/);
             Console.WriteLine(Config.GetXML());
+        }
+
+        private void TM5ToolStripMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //double sysInfoWindowWidth = Width;
+            double sysInfoWindowHeight = Height + 8;
+            double sysInfoWindowTop = Top - 1;
+            double sysInfoWindowLeft = Left + Width - 3;
+            WindowStartupLocation location = WindowStartupLocation.Manual;
+
+            var tm5Wnd = new TM5Window()
+            {
+                //Width = sysInfoWindowWidth,
+                Height = sysInfoWindowHeight,
+                WindowStartupLocation = location,
+                Top = sysInfoWindowTop,
+                Left = sysInfoWindowLeft
+            };
+
+            tm5Wnd.Show();
         }
     }
 }
