@@ -38,6 +38,7 @@ namespace ZenTimings
             SysInfoWindowWidth = 0;
             NotifiedChangelog = "";
             NotifiedRembrandt = "";
+            TM5ExecutablePath = "";
 
             Save();
 
@@ -134,5 +135,6 @@ namespace ZenTimings
         public double SysInfoWindowHeight { get; set; }
         public string NotifiedChangelog { get; set; } = "";
         public string NotifiedRembrandt { get; set; } = "";
+        public string TM5ExecutablePath { get; set; } = "";
     }
 }

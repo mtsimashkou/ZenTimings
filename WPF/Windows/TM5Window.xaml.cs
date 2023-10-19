@@ -1,5 +1,6 @@
 ﻿using IniParser;
 using IniParser.Model;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Interop;
@@ -19,6 +21,8 @@ namespace ZenTimings.Windows
     /// </summary>
     public partial class TM5Window : Window
     {
+        private const string TM5Executable = "TM5.exe";
+
         private static class UIAutomationConstants
         {
             public const string ButtonHomeId = "1000";
@@ -126,7 +130,8 @@ namespace ZenTimings.Windows
             public string Text { get; set; }
         }
 
-        private string tm5ExecutablePath;
+        internal readonly AppSettings appSettings = (Application.Current as App)?.settings;
+
         private int logLinesCount = 0;
         private IntPtr tm5WindowHandle = IntPtr.Zero;
 
@@ -138,22 +143,23 @@ namespace ZenTimings.Windows
         {
             InitializeComponent();
 
-            tm5ExecutablePath = "d:\\work\\dev\\TOOLS\\tm5-wrapper\\TM5\\TM5.exe";
-
-            InitializeTabControl();
-
-            borderHost.Child = new ExternalProcessWindowHost(new ProcessStartInfo
+            if (!string.IsNullOrEmpty(appSettings.TM5ExecutablePath) &&
+                File.Exists(appSettings.TM5ExecutablePath) &&
+                Path.GetFileName(appSettings.TM5ExecutablePath).Equals(TM5Executable))
             {
-                FileName = tm5ExecutablePath,
-                UseShellExecute = false
-            });
+                InitializeTM5Controls();
+            }
+            else
+            {
+                canvasOpen.Visibility = Visibility.Visible;
+            }
         }
 
-        private void InitializeTabControl()
+        private void InitializeTM5Controls()
         {
             dgLogView.ItemsSource = logView;
 
-            var linkFileName = Path.GetDirectoryName(tm5ExecutablePath) + "\\bin\\Cfg.link";
+            var linkFileName = Path.GetDirectoryName(appSettings.TM5ExecutablePath) + "\\bin\\Cfg.link";
             var configFileName = File.ReadAllText(linkFileName);
 
             var parser = new FileIniDataParser();
@@ -170,13 +176,20 @@ namespace ZenTimings.Windows
 
             //borderHost.Height = borderHost.Height + 100;
             //tabControl.Visibility = Visibility.Collapsed;
+
+            borderHost.Child = new ExternalProcessWindowHost(new ProcessStartInfo
+            {
+                FileName = appSettings.TM5ExecutablePath,
+                UseShellExecute = false
+            });
         }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
 
-            if (tm5WindowHandle == IntPtr.Zero)
+            if (canvasOpen.Visibility == Visibility.Hidden &&
+                tm5WindowHandle == IntPtr.Zero)
             {
                 StartTM5Process();
             }
@@ -208,9 +221,9 @@ namespace ZenTimings.Windows
             Title = element.Current.Name;
 
             var elements = element.FindAll(TreeScope.Children, new OrCondition(
+                //new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.LogListBoxId),
                 new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.ButtonHomeId),
-                new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.ButtonMailId),
-                new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.LogListBoxId)));
+                new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.ButtonMailId)));
 
             foreach (AutomationElement item in elements)
             {
@@ -222,10 +235,10 @@ namespace ZenTimings.Windows
                 {
                     tabView.InfoView.Mail = item.Current.Name;
                 }
-                else if (item.Current.AutomationId == UIAutomationConstants.LogListBoxId)
+                /*else if (item.Current.AutomationId == UIAutomationConstants.LogListBoxId)
                 {
                     tabView.InfoView.Header = item.Current.Name.Trim();
-                }
+                }*/
             }
 
             Automation.AddAutomationEventHandler(
@@ -326,6 +339,44 @@ namespace ZenTimings.Windows
             {
                 Console.WriteLine($"{element.Current.LocalizedControlType} <-> {element.Current.Name} <-> {element.Current.AutomationId}");
             }
+        }
+
+        private void btnOpen_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = $"TM5 Executable|{TM5Executable}";
+            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                appSettings.TM5ExecutablePath = openFileDialog.FileName;
+                appSettings.Save();
+
+                InitializeTM5Controls();
+
+                canvasOpen.Visibility = Visibility.Hidden;
+
+                StartTM5Process();
+            }
+        }
+
+        private void btnInfoHome_Click(object sender, RoutedEventArgs e)
+        {
+            //Process.Start("https://testmem.tz.ru");
+            AutomationElement element = AutomationElement.FromHandle(tm5WindowHandle);
+
+            var button = element.FindFirst(TreeScope.Children, new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.ButtonHomeId));
+            var invokePattern = button.GetCurrentPattern(InvokePattern.Pattern) as InvokePattern;
+            invokePattern.Invoke();
+        }
+
+        private void btnInfoMail_Click(object sender, RoutedEventArgs e)
+        {
+            AutomationElement element = AutomationElement.FromHandle(tm5WindowHandle);
+
+            var button = element.FindFirst(TreeScope.Children, new PropertyCondition(AutomationElement.AutomationIdProperty, UIAutomationConstants.ButtonMailId));
+            var invokePattern = button.GetCurrentPattern(InvokePattern.Pattern) as InvokePattern;
+            invokePattern.Invoke();
         }
     }
 }

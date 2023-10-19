@@ -13,10 +13,36 @@
         ResizeMode="CanMinimize"
         BorderBrush="{DynamicResource WindowBorderColor}">
     <StackPanel>
-        <Border x:Name="borderHost" Height="210"/>
+        <Canvas x:Name="canvasOpen" Visibility="Hidden">
+            <TextBlock Text="Please select TM5 executable" Margin="115,220,0,0" />
+            <Button x:Name="btnOpen" Content="Open" Width="100" Margin="140,245,0,0" Click="btnOpen_Click" />
+        </Canvas>
+        <Border x:Name="borderHost" Height="210">
+            <Border.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=canvasOpen, Path=Visibility}" Value="Visible">
+                            <Setter Property="Border.Visibility" Value="Hidden"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
         <TabControl x:Name="tabControl" Height="300" DataContext="{Binding}" SelectedIndex="2">
-            <TabItem Header="{Binding InfoView.Header, FallbackValue='Info'}">
-                <Grid Background="#FFE5E5E5"/>
+            <TabControl.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=canvasOpen, Path=Visibility}" Value="Visible">
+                            <Setter Property="TabControl.Visibility" Value="Hidden"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Style>
+            <TabItem Header="Info" Height="26" VerticalAlignment="Top">
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="btnInfoHome" Content="{Binding InfoView.Home, FallbackValue='Home'}" HorizontalAlignment="Left" Margin="152,49,0,0" VerticalAlignment="Top" Click="btnInfoHome_Click"/>
+                    <Button x:Name="btnInfoMail" Content="{Binding InfoView.Mail, FallbackValue='Mail'}" HorizontalAlignment="Left" Margin="152,89,0,0" VerticalAlignment="Top" Click="btnInfoMail_Click"/>
+                </Grid>
             </TabItem>
             <TabItem Header="{Binding ConfigView.Header, FallbackValue='Configuration'}">
                 <Grid Background="#FFE5E5E5">
